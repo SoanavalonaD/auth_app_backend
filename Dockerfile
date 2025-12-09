@@ -5,6 +5,8 @@ ENV PYTHONUNBUFFERED=1
 
 RUN find /etc/apt/ -name '*.sources' -exec sed -i 's|^\(URIs: \)http://|\1https://|' {} +
 
+RUN apt-get update && apt-get install -y netcat-traditional && rm -rf /var/lib/apt/lists/*
+
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     postgresql-client \
@@ -35,6 +37,9 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync
 
 ENV PYTHONPATH=/app
+
+COPY scripts/entrypoint.sh /app/scripts/entrypoint.sh
+RUN chmod +x /app/scripts/entrypoint.sh 
 
 COPY ./scripts /app/scripts
 COPY ./src /app/src

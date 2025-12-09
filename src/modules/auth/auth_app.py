@@ -1,11 +1,16 @@
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import Depends, HTTPException, status
+from jose import jwt, JWTError
+
 from src.data.domain import get_db_session
-# Importation de UserLogin est essentielle pour authenticate_user
-from src.modules.auth.auth_dto import UserCreate, UserInDB, Token, UserLogin 
+from src.modules.auth.auth_dto import UserCreate, UserInDB, Token, UserLogin, TokenData
 from src.modules.auth.auth_repo import UserRepository
 from src.modules.auth.auth_metier import get_password_hash, verify_password, create_access_token
 from src.modules.auth.auth_model import User
+from src.config import settings
+
+
 
 class AuthAppService:
     def __init__(self, db: AsyncSession = Depends(get_db_session)):
@@ -49,3 +54,29 @@ class AuthAppService:
         
         access_token = create_access_token(data={"sub": str(user.id)})
         return Token(access_token=access_token)
+    
+    async def get_current_user_id_from_token(self, token: str) -> int:
+        try:
+            payload = jwt.decode(
+                token, 
+                settings.SECRET_KEY, 
+                algorithms=[settings.ALGORITHM]
+            )
+
+            user_id_str: str = payload.get("sub")
+            if user_id_str is None:
+                raise JWTError("Sub field missing in token payload")
+
+            user_id = int(user_id_str)
+            token_data = TokenData(user_id=user_id)
+
+        except JWTError as e:
+            print(f"JWT Error: {e}")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token invalide ou expiré.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        return token_data.user_id
+    

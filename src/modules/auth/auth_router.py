@@ -1,11 +1,25 @@
 from fastapi import APIRouter, Depends, status
-from src.modules.auth.auth_dto import UserCreate, UserInDB, Token, UserLogin
+from fastapi.security import OAuth2PasswordBearer
+from src.modules.auth.auth_app import UserCreate, UserInDB, Token, UserLogin
 from src.modules.auth.auth_app import AuthAppService
 
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 router = APIRouter(
     prefix="/auth",
     tags=["Authentification"],
 )
+
+
+async def get_current_user_id(
+    token: str = Depends(oauth2_scheme),
+    auth_service: AuthAppService = Depends()
+) -> int:
+    """
+    Dépendance qui valide le token JWT et retourne l'ID de l'utilisateur.
+    """
+    return await auth_service.get_current_user_id_from_token(token)
+
 
 @router.post(
     "/register", 
@@ -38,3 +52,19 @@ async def login(
     Valide les identifiants et retourne un jeton d'accès JWT.
     """
     return await auth_service.authenticate_user(user_login)
+
+
+@router.get(
+    "/users/me",
+    summary="Récupère l'ID de l'utilisateur actuellement connecté",
+)
+async def read_users_me(
+    # Le user_id est injecté par la dépendance 'get_current_user_id'
+    current_user_id: int = Depends(get_current_user_id) 
+):
+    """
+    Point de terminaison sécurisé. 
+    Il retourne l'ID de l'utilisateur qui a fourni un jeton valide.
+    Si le jeton est invalide ou manquant, FastAPI retourne 401 Unauthorized.
+    """
+    return {"user_id": current_user_id, "message": "Accès autorisé à la ressource protégée."}
