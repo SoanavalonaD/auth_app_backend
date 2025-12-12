@@ -9,7 +9,6 @@ from src.config import settings
 from src.data.domain import Base, get_db_session
 
 # Import des modèles pour s'assurer qu'ils sont enregistrés dans Base.metadata
-from src.modules.auth.auth_model import User
 
 @pytest.fixture(scope="function")
 async def db_session():

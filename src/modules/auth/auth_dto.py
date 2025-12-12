@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from typing import Optional
 
 # Schémas de base/DTO pour l'Entrée (Création/Mise à jour)
@@ -17,9 +17,7 @@ class UserInDB(BaseModel):
     email: EmailStr
     is_active: bool
 
-    class Config:
-        """Permet de mapper l'objet SQLAlchemy (ORM) au schéma Pydantic."""
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class Token(BaseModel):
     """Schéma Pydantic pour la réponse JWT (Access Token)."""

@@ -1,6 +1,5 @@
 from fastapi import Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import Depends, HTTPException, status
 from jose import jwt, JWTError
 
 from src.data.domain import get_db_session

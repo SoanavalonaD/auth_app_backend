@@ -15,10 +15,10 @@ dependencies = [
     "sqlalchemy",
     "pydantic[email]",
     "pydantic-settings",
-    "passlib[bcrypt]",
+    "passlib==1.7.4",
     "python-jose[cryptography]",
     "asyncpg", # Driver pour PostgreSQL
-    "bcrypt==3.2.2",
+    "bcrypt==4.1.2",
 ]
 
 # Dépendances de développement (dev-dependencies)

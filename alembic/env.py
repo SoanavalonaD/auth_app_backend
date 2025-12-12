@@ -9,6 +9,7 @@ from alembic import context
 
 from src.config import settings
 from src.data.domain import Base
+from src.modules.auth.auth_model import User  # Import needed for Alembic to see the model
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

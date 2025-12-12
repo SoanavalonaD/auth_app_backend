@@ -17,5 +17,9 @@ done
 
 echo "PostgreSQL est accessible. Démarrage de l'application..."
 
+# Appliquer les migrations Alembic
+echo "Application des migrations de base de données..."
+alembic upgrade head
+
 # Exécute la commande principale spécifiée dans docker-compose.yml
 exec "$@"
